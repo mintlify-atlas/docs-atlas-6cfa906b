@@ -1,0 +1,122 @@
+---
+title: "Deploy Car Bot to Vercel: full step-by-step guide"
+description: "Deploy Car Bot on Vercel by pushing to GitHub, connecting the repo, setting environment variables, and clicking Deploy. Full troubleshooting included."
+---
+
+Car Bot is designed for zero-configuration deployment on Vercel. The `vercel.json` file included in the repository routes all `/api/*` requests to the serverless handler in `api/index.ts` and serves the React frontend as a single-page application for every other path. A full deployment takes under five minutes.
+
+## Deploy to Vercel
+
+<Steps>
+  <Step title="Push your code to GitHub">
+    Commit all changes and push the repository to GitHub. Vercel connects directly to GitHub to pull your code on every deployment.
+
+    ```bash
+    git add .
+    git commit -m "Ready for Vercel deployment"
+    git push origin main
+    ```
+  </Step>
+
+  <Step title="Connect the repository in the Vercel Dashboard">
+    Open the [Vercel Dashboard](https://vercel.com/dashboard), click **Add New → Project**, and import your GitHub repository. Vercel automatically detects the `vercel.json` configuration — no framework preset selection is required.
+  </Step>
+
+  <Step title="Configure environment variables">
+    In the **Environment Variables** section during project setup, add the following three variables:
+
+    | Variable | Value |
+    |---|---|
+    | `DATABASE_URL` | Your PostgreSQL connection string |
+    | `NODE_ENV` | `production` |
+    | `SESSION_SECRET` | A long random string |
+
+    See [Environment variables](/deployment/environment-variables) for how to generate a secure `SESSION_SECRET`.
+  </Step>
+
+  <Step title="Deploy">
+    Click **Deploy**. Vercel runs `tsc && vite build`, places the compiled frontend in `dist/public/`, and deploys the serverless function from `api/index.ts`. Your Car Bot instance will be live at the assigned `.vercel.app` URL within a minute or two.
+  </Step>
+</Steps>
+
+## Vercel configuration
+
+The `vercel.json` file in the repository root controls routing, function limits, and the build command.
+
+```json vercel.json
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/index.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ]
+}
+```
+
+Key settings:
+
+- **`maxDuration: 30`** — The maximum allowed timeout on Vercel's Hobby plan. Long-running database queries must complete within this window.
+- **`memory: 1024`** — 1 GB of memory allocated to the serverless function.
+- **API route** — All requests to `/api/*` are handled by `api/index.ts`, with all HTTP methods supported. The handler imports and invokes `createApp()` from the server module.
+- **SPA fallback** — All other paths return `index.html` with a 200 status, allowing the React frontend's client-side router (Wouter) to handle navigation.
+
+## Subsequent deployments
+
+After the initial setup, every push to your connected branch triggers a new deployment automatically. You can also trigger a manual deployment from the Vercel Dashboard or with the CLI:
+
+```bash
+npx vercel --prod
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Cannot find module">
+    This error appears when the TypeScript compilation step was skipped or failed. Run the build locally first to confirm it succeeds before pushing.
+
+    ```bash
+    npm run build
+    ```
+
+    If the build passes locally but fails on Vercel, check that all dependencies are listed under `dependencies` (not `devDependencies`) if they are needed at runtime.
+  </Accordion>
+
+  <Accordion title="DATABASE_URL not found">
+    The serverless function cannot read environment variables that were not added to Vercel before deployment. Go to **Settings → Environment Variables** in the Vercel Dashboard, add `DATABASE_URL`, and then redeploy. Variable changes require a new deployment to take effect.
+  </Accordion>
+
+  <Accordion title="Function timeout (error 504)">
+    The serverless function exceeded the 30-second limit imposed by Vercel's Hobby plan. Common causes are slow database queries or missing connection pooling. To fix this:
+
+    - Add a connection pooler (such as PgBouncer or Neon's pooled connection string) between Vercel and your database.
+    - Optimize slow queries with indexes on frequently queried columns.
+    - Review the request logging output (`method`, `path`, `status`, `duration`) added by `createApp()` to identify the slow route.
+  </Accordion>
+
+  <Accordion title="CORS errors in the browser">
+    CORS issues typically mean a request is not being routed through `vercel.json` correctly. Verify that:
+
+    - All client-side API calls use a path starting with `/api/`.
+    - The `/api/(.*)` route in `vercel.json` is listed before the SPA fallback route.
+    - The `NODE_ENV` environment variable is set to `production` so the Express app does not start the Vite middleware.
+  </Accordion>
+</AccordionGroup>

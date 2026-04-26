@@ -1,0 +1,158 @@
+---
+title: "Car Bot server API: createApp and IStorage reference"
+description: "Internal server-side API for developers extending Car Bot: createApp(), registerRoutes(), IStorage methods, and the User and InsertUser TypeScript types."
+---
+
+This page documents the internal server-side API surface that developers need when self-hosting, extending, or contributing to Car Bot. It covers the Express app factory, the route registration function, the storage interface, and the TypeScript types derived from the database schema. This is not the public HTTP API surface exposed to end users — it is the layer that developers work with when modifying or deploying the server.
+
+<Note>
+  These are the internal server APIs for developers self-hosting or extending Car Bot. The public HTTP endpoints that the Car Bot frontend calls are all registered inside `registerRoutes()` under the `/api` prefix and are not separately documented here.
+</Note>
+
+## `createApp()` — Express app factory
+
+**File:** `server/index.ts`
+
+`createApp()` is an async function that constructs and returns a fully configured Express application. It is the single entry point for the server and is imported by `api/index.ts` to create the Vercel serverless handler.
+
+```typescript
+export async function createApp(): Promise<Express>
+```
+
+The returned app has the following middleware and behavior already configured:
+
+- **JSON body parsing** with raw body capture for webhook-compatible use cases
+- **Request logging** for all `/api/*` routes, recording the HTTP method, path, response status, and duration
+- **Route registration** via `registerRoutes()` (see below)
+- **Error handling middleware** as the last middleware in the chain
+- **Static file serving** — serves `dist/public/` in production (`NODE_ENV=production`), or starts the Vite dev server middleware in development
+
+**Usage in `api/index.ts`:**
+
+```typescript
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { createServer } from "http";
+import { createApp } from "../server/app";
+
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse,
+) {
+  const httpServer = createServer();
+  const app = await createApp();
+  app(req as any, res as any);
+}
+```
+
+## `registerRoutes(httpServer, app)` — Route registration
+
+**File:** `server/routes.ts`
+
+`registerRoutes()` is called by `createApp()` to attach all application routes to the Express instance. Developers adding new routes to Car Bot should do so inside this function.
+
+```typescript
+export async function registerRoutes(
+  httpServer: Server,
+  app: Express
+): Promise<Server>
+```
+
+All routes must use the `/api` path prefix to be correctly handled by the `vercel.json` routing rules in production. The function has access to the `storage` export from `server/storage.ts` for all CRUD operations.
+
+### Parameters
+
+<ParamField path="httpServer" type="Server" required>
+  The Node.js `http.Server` instance wrapping the Express app. Pass this when a route needs access to the raw HTTP server (for example, to attach a WebSocket server).
+</ParamField>
+
+<ParamField path="app" type="Express" required>
+  The Express application instance returned by `express()`. Use `app.get()`, `app.post()`, etc. to register routes inside this function.
+</ParamField>
+
+### Return value
+
+<ResponseField name="httpServer" type="Server">
+  Returns the same `http.Server` instance passed in, after routes have been registered.
+</ResponseField>
+
+## `IStorage` — Data access interface
+
+**File:** `server/storage.ts`
+
+All database operations in Car Bot go through the `IStorage` interface. To replace the default in-memory store with a PostgreSQL-backed implementation, create a class that satisfies this interface and export it as `storage`.
+
+```typescript
+export interface IStorage {
+  getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+}
+```
+
+### `getUser(id)`
+
+Retrieves a user by their UUID primary key.
+
+<ParamField path="id" type="string" required>
+  The UUID of the user to retrieve. Corresponds to the `id` column in the `users` table.
+</ParamField>
+
+<ResponseField name="return" type="Promise<User | undefined>">
+  Resolves to the matching `User` object, or `undefined` if no user with that ID exists.
+</ResponseField>
+
+### `getUserByUsername(username)`
+
+Retrieves a user by their unique username. Used by the Passport.js local strategy during authentication.
+
+<ParamField path="username" type="string" required>
+  The exact username string to look up. The `users` table enforces a unique constraint on this column.
+</ParamField>
+
+<ResponseField name="return" type="Promise<User | undefined>">
+  Resolves to the matching `User` object, or `undefined` if no user with that username exists.
+</ResponseField>
+
+### `createUser(user)`
+
+Inserts a new user record into the store.
+
+<ParamField path="user" type="InsertUser" required>
+  An object conforming to the `InsertUser` type — `username` and `password` are both required. The `id` field is generated automatically (UUID v4 via `crypto.randomUUID()` in `MemStorage`, or `gen_random_uuid()` in PostgreSQL).
+</ParamField>
+
+<ResponseField name="return" type="Promise<User>">
+  Resolves to the full `User` object as stored, including the generated `id`.
+</ResponseField>
+
+## TypeScript types
+
+These types are exported from `shared/schema.ts` and used throughout both the server and client.
+
+### `User`
+
+Represents a full row from the `users` table, as returned by a `SELECT`.
+
+<ResponseField name="id" type="string">
+  UUID primary key, generated by PostgreSQL's `gen_random_uuid()` or Node's `crypto.randomUUID()`.
+</ResponseField>
+
+<ResponseField name="username" type="string">
+  Unique display name for the user. Enforced as `NOT NULL UNIQUE` at the database level.
+</ResponseField>
+
+<ResponseField name="password" type="string">
+  Stored password value. In production this should be a hashed value — never store plaintext passwords.
+</ResponseField>
+
+### `InsertUser`
+
+The shape required when calling `createUser()`. Derived from `insertUserSchema` via `drizzle-zod`, so it is validated automatically when inserted.
+
+<ParamField path="username" type="string" required>
+  The username for the new user. Must be unique across all existing users.
+</ParamField>
+
+<ParamField path="password" type="string" required>
+  The password for the new user.
+</ParamField>

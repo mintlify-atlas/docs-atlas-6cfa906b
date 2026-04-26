@@ -1,0 +1,102 @@
+---
+title: "Local development setup for Car Bot contributors"
+description: "Run Car Bot on your local machine with Vite's dev server or the Vercel CLI to simulate the serverless environment before deploying to production."
+---
+
+Car Bot runs a Vite-powered frontend with an Express backend during local development. You can use the built-in `npm run dev` command for the fastest feedback loop, or `vercel dev` to simulate the exact Vercel serverless environment before you deploy.
+
+## Prerequisites
+
+- Node.js 18 or later
+- A PostgreSQL database (optional — the default in-memory store works for local development)
+- Git
+
+## Install dependencies
+
+Clone the repository and install all dependencies from the root of the project.
+
+<CodeGroup>
+
+```bash npm
+npm install
+```
+
+```bash yarn
+yarn install
+```
+
+```bash pnpm
+pnpm install
+```
+
+</CodeGroup>
+
+## Configure environment variables
+
+Copy the example environment file and fill in your values. At minimum you need `SESSION_SECRET` for local development; `DATABASE_URL` is only required if you want persistent storage.
+
+```bash
+cp .env.example .env.local
+```
+
+See [Environment variables](/deployment/environment-variables) for a full description of each variable.
+
+## Start the development server
+
+<Steps>
+  <Step title="Push the database schema (optional)">
+    If you are using a real PostgreSQL database, apply the Drizzle schema before starting the server.
+
+    ```bash
+    npm run db:push
+    ```
+
+    Skip this step if you are using the default in-memory store.
+  </Step>
+
+  <Step title="Start the Vite dev server">
+    Run the development server. Vite serves the React frontend with hot-module replacement, and the Express backend handles all `/api` requests.
+
+    ```bash
+    npm run dev
+    ```
+
+    The application is available at `http://localhost:5173` by default.
+  </Step>
+
+  <Step title="Verify TypeScript (optional)">
+    Run the TypeScript compiler in check-only mode to catch type errors without emitting output files.
+
+    ```bash
+    npm run check
+    ```
+  </Step>
+</Steps>
+
+## Simulate the Vercel environment locally
+
+If you want to test the serverless function routing before deploying, use the Vercel CLI. This runs the same `api/index.ts` handler that Vercel invokes in production.
+
+```bash
+npx vercel dev
+```
+
+The Vercel CLI reads your `vercel.json` configuration and routes requests identically to the production deployment.
+
+## Build for production
+
+To produce a production build locally and verify the output before deploying:
+
+```bash
+npm run build
+```
+
+This runs `tsc && vite build`, emitting the frontend to `dist/public/` and compiling TypeScript. You can then preview the built output:
+
+```bash
+npm run preview
+```
+
+<Note>
+  The `npm run start` command (`node dist/index.js`) is intended for traditional Node.js hosting. On Vercel, the serverless handler in `api/index.ts` is used instead.
+</Note>

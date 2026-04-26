@@ -1,81 +1,70 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
-icon: 'rocket'
+title: "Get started with Car Bot: dealer onboarding guide"
+description: "Set up your Car Bot dealer account, add your vehicle inventory, activate the AI chatbot, and start qualifying leads — all in under 30 minutes."
 ---
 
-## Get started in three steps
+Car Bot gets your dealership running with AI-powered sales automation in a handful of steps. This guide walks you through account creation, inventory setup, chatbot activation, and your first look at the analytics dashboard.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Create your account">
+    Go to the Car Bot registration page. Fill in your first name, last name, dealership name, country, estimated inventory size, and corporate email address. Choose a password, then click **Probar Demo Gratis** to create your account.
 
-### Step 1: Set up your local environment
+    <Info>
+      Your account is tied to your corporate email. After registering, you are redirected automatically to the dashboard where you can start setting up your dealership.
+    </Info>
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Set up your dealer profile">
+    After logging in, you are taken directly to the dashboard. From here, configure your dealership name and any settings relevant to your operation.
 
-### Step 2: Deploy your changes
+    Your dashboard is the control center for everything Car Bot tracks — leads, conversations, inventory counts, and scheduled appointments.
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+  <Step title="Add your vehicle inventory">
+    Navigate to the vehicle catalog page to access your inventory. Car Bot supports browsable inventory with the following filters:
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    - **Search** — find vehicles by keyword
+    - **Price range** — drag a slider to set a maximum price ceiling up to $100,000
+    - **Condition** — filter by New or Used
+    - **Make** — narrow results to a specific manufacturer
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    Each vehicle has its own detail page with photos, specs, and pricing. The AI chatbot reads from this catalog in real time to answer customer questions accurately.
 
-### Step 3: Go live
+    <Note>
+      The number of vehicles you can list depends on your plan: up to 20 on Starter, up to 100 on Premium, and unlimited on Enterprise. See [plans and pricing](/pricing/overview) for details.
+    </Note>
+  </Step>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+  <Step title="Activate the AI chatbot">
+    The Car Bot widget is available automatically on every page of your dealership site — you do not need to install or embed any code manually.
 
-## Next steps
+    Look for the red chat bubble in the bottom right corner of any page. Click it to open the chat interface and interact with a live demo of the bot's capabilities.
 
-Now that you have your docs running, explore these key features:
+    In your dashboard settings, you can configure the bot's personality:
 
-<CardGroup cols={2}>
+    - **Formal** — professional tone suited to premium or luxury inventory
+    - **Friendly** — conversational tone for a welcoming buyer experience
+    - **Sales-focused** — direct language optimized for conversion
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+    <Tip>
+      Use the floating widget on the Car Bot homepage to test different conversation flows before going live with customers.
+    </Tip>
+  </Step>
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+  <Step title="Monitor leads and analytics">
+    Return to your dashboard at any time to view real-time performance metrics:
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+    | Metric | What it shows |
+    |--------|--------------|
+    | Conversations | Total chatbot sessions started |
+    | Leads qualified | Buyers who passed qualification criteria |
+    | Inventory count | Number of active vehicles in your catalog |
+    | Estimated sales | Projected revenue from qualified leads |
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
+    The dashboard also includes a **bot activity chart** showing conversations per day, and a **traffic sources breakdown** across Web, Facebook, Instagram, and Referrals.
+  </Step>
+</Steps>
 
-</CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+<Check>
+Your dealership is ready. Car Bot is live, your inventory is connected, and leads are being qualified automatically. Head to your dashboard to watch it work.
+</Check>

@@ -1,0 +1,77 @@
+{
+  "projectType": "saas",
+  "projectName": "Car Bot",
+  "projectDescription": "An AI-powered sales automation platform for automotive dealerships that handles customer conversations, qualifies leads, and manages inventory 24/7.",
+  "theme": "almond",
+  "primaryColor": "#E10600",
+  "lightColor": null,
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "quickstart", "how-it-works"]
+          },
+          {
+            "group": "Core Features",
+            "pages": ["features/ai-chatbot", "features/lead-qualification", "features/inventory-management", "features/analytics-dashboard"]
+          },
+          {
+            "group": "For Dealers",
+            "pages": ["dealers/dealer-network", "dealers/cars-catalog", "dealers/appointment-scheduling"]
+          },
+          {
+            "group": "Plans & Pricing",
+            "pages": ["pricing/overview", "pricing/comparison"]
+          },
+          {
+            "group": "Support",
+            "pages": ["faq", "contact"]
+          }
+        ]
+      },
+      {
+        "tab": "Deployment",
+        "groups": [
+          {
+            "group": "Setup",
+            "pages": ["deployment/local-development", "deployment/environment-variables", "deployment/vercel"]
+          },
+          {
+            "group": "Architecture",
+            "pages": ["deployment/project-structure", "deployment/database", "deployment/api-reference"]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "24/7 AI chatbot that handles customer inquiries automatically",
+    "Lead qualification engine that filters serious buyers from casual browsers",
+    "Real-time analytics dashboard with conversation, sales, and traffic metrics",
+    "Vehicle inventory catalog with search and filter capabilities",
+    "Automated appointment scheduling synced with dealer calendars",
+    "WhatsApp and email integration for lead follow-up",
+    "Multi-dealer network with certified dealer profiles",
+    "Three-tier pricing: Starter ($49/mo), Premium ($149/mo), Enterprise (custom)"
+  ],
+  "publicApiSurface": [
+    "POST /api/auth/register — Register a new dealer account",
+    "POST /api/auth/login — Authenticate and start a session",
+    "POST /api/auth/logout — End the current session",
+    "GET /api/user — Get current authenticated user",
+    "GET /api/cars — List vehicles in inventory",
+    "POST /api/cars — Add a vehicle to inventory",
+    "GET /api/cars/:id — Get vehicle details",
+    "GET /api/dealers — List certified dealers",
+    "GET /api/dealers/:id — Get dealer details",
+    "createApp() — Express application factory (server/index.ts)",
+    "registerRoutes(httpServer, app) — Register API routes (server/routes.ts)",
+    "IStorage.getUser(id) — Retrieve user by ID (server/storage.ts)",
+    "IStorage.getUserByUsername(username) — Retrieve user by username (server/storage.ts)",
+    "IStorage.createUser(user) — Create a new user (server/storage.ts)"
+  ]
+}

@@ -1,0 +1,61 @@
+---
+title: "Car Bot monorepo: project structure and architecture"
+description: "Overview of the Car Bot codebase layout — React frontend in client/, Express backend in server/, Vercel entry in api/, and shared Zod schemas."
+---
+
+Car Bot is organized as a monorepo with four top-level directories that separate concerns clearly: the React frontend lives in `client/`, the Express backend in `server/`, the Vercel serverless entry point in `api/`, and shared TypeScript types and schemas in `shared/`. This layout keeps the frontend and backend independently maintainable while allowing them to share a single schema definition without duplication.
+
+## Directory tree
+
+```
+Car-Book/
+├── client/                 # Frontend React application
+│   ├── src/
+│   │   ├── components/     # Reusable UI components (Radix UI, Tailwind)
+│   │   ├── pages/          # Route-level page components (Wouter)
+│   │   ├── hooks/          # Custom React hooks and TanStack Query logic
+│   │   └── lib/            # Utility functions and API client helpers
+│   └── package.json
+├── server/                 # Backend Express application
+│   ├── index.ts            # App factory (createApp)
+│   ├── routes.ts           # Route definitions (registerRoutes)
+│   ├── storage.ts          # Data access layer (IStorage, MemStorage)
+│   └── vite.ts             # Vite middleware setup for development
+├── api/                    # Vercel serverless entry point
+│   └── index.ts            # Imports createApp and exports a serverless handler
+├── shared/                 # Code shared between client and server
+│   └── schema.ts           # Drizzle table definitions and Zod validation schemas
+├── vercel.json             # Vercel routing and function configuration
+├── vite.config.ts          # Vite bundler configuration
+├── tsconfig.json           # Root TypeScript configuration
+└── package.json            # Root scripts and dependencies
+```
+
+## Top-level directories
+
+### `client/`
+
+The React 19 frontend built with Vite. Components use Radix UI primitives styled with TailwindCSS, Framer Motion for animations, and Recharts for the analytics dashboard. Client-side routing is handled by Wouter. All data fetching goes through TanStack Query, which calls the Express API under the `/api` prefix.
+
+### `server/`
+
+The Express 4 backend. `index.ts` exports `createApp()`, which sets up JSON parsing, request logging for all `/api` routes, error handling middleware, and static file serving. `routes.ts` contains `registerRoutes()`, where all application routes are defined. `storage.ts` defines the `IStorage` interface and the default `MemStorage` in-memory implementation. In development, `vite.ts` integrates the Vite dev server as Express middleware so both the frontend and backend run on one port.
+
+### `api/`
+
+Contains a single file, `index.ts`, which is the Vercel serverless function entry point. It imports `createApp()` from the server and wraps it in the handler format Vercel expects. All `/api/*` requests from the `vercel.json` routing rules are dispatched here.
+
+### `shared/`
+
+TypeScript code imported by both `client/` and `server/`. `schema.ts` defines Drizzle ORM table schemas and exports Zod validation schemas (via `drizzle-zod`) and TypeScript types. Sharing this file ensures the database schema, validation rules, and TypeScript types stay in sync across the entire stack. See [Database](/deployment/database) for the full schema reference.
+
+## Build output
+
+Running `npm run build` (`tsc && vite build`) produces two outputs:
+
+| Output path | Contents |
+|---|---|
+| `dist/public/` | Compiled and bundled React frontend (HTML, JS, CSS) |
+| `api/` | TypeScript source consumed directly by Vercel's function runtime |
+
+On Vercel, the `dist/public/` directory is served as static assets and the `api/index.ts` serverless function handles all dynamic API requests. The `vercel.json` SPA fallback route ensures the React app's client-side router receives every non-API request.

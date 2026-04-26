@@ -1,0 +1,55 @@
+---
+title: "Car Bot environment variables: DATABASE_URL and more"
+description: "Reference for all environment variables Car Bot requires: DATABASE_URL for PostgreSQL, NODE_ENV for runtime mode, and SESSION_SECRET for session signing."
+---
+
+Car Bot reads its runtime configuration from environment variables. All three variables listed below are required for production deployments. In local development, `DATABASE_URL` may be omitted when using the default in-memory store.
+
+## Example `.env` file
+
+Create this file at the root of the project for local development. On Vercel, set these values through the Vercel Dashboard instead of committing this file.
+
+```bash .env.local
+# Local development — copy from .env.example
+DATABASE_URL=postgresql://localhost/carbook_dev
+NODE_ENV=development
+SESSION_SECRET=development-secret-key-change-in-production
+```
+
+<Warning>
+  Never commit real credentials to version control. Add `.env.local` and `.env` to your `.gitignore` file. Use your hosting provider's secrets manager for production values.
+</Warning>
+
+## Variables
+
+<ParamField path="DATABASE_URL" type="string" required>
+  The full PostgreSQL connection string used by Drizzle ORM and `connect-pg-simple` for session storage. The connection string must include the protocol, credentials, host, port, and database name.
+
+  ```
+  postgresql://user:password@host:5432/carbook
+  ```
+
+  For local development without persistent storage, you can omit this variable — Car Bot falls back to the in-memory `MemStorage` implementation. See [Database](/deployment/database) for more detail.
+</ParamField>
+
+<ParamField path="NODE_ENV" type="string" required>
+  Controls the runtime environment. Set to `production` on all deployed environments. When set to `production`, Car Bot serves the pre-built static files from `dist/public/` rather than starting the Vite dev server.
+
+  Accepted values: `development`, `production`
+</ParamField>
+
+<ParamField path="SESSION_SECRET" type="string" required>
+  A random string used by `express-session` to sign and verify session cookies. A compromised secret allows session forgery, so this value must be long, random, and kept private.
+
+  Generate a strong secret with:
+
+  ```bash
+  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  ```
+</ParamField>
+
+## Setting variables on Vercel
+
+When deploying to Vercel, add these variables through the project's **Settings → Environment Variables** panel in the Vercel Dashboard. Vercel injects them into the serverless function runtime automatically.
+
+See [Deploy to Vercel](/deployment/vercel) for the full deployment walkthrough.

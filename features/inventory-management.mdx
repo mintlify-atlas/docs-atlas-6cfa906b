@@ -1,0 +1,73 @@
+---
+title: "Inventory management: connect your catalog to Car Bot"
+description: "Car Bot learns your vehicle catalog to answer buyer questions accurately. Manage a searchable, filterable inventory grid from your dealer dashboard."
+---
+
+Car Bot's inventory management connects your vehicle catalog directly to the AI chatbot. When you add a car to your inventory, the bot immediately learns its details — make, model, year, price, mileage, fuel type, location, and condition — and can discuss it accurately with any customer who asks. The result is a chatbot that always has the right answer, without you having to script anything manually.
+
+## The cars catalog page
+
+Your inventory is available to buyers through the cars catalog at `/cars`. It presents your vehicles in a searchable, filterable grid that works on any device. Buyers can narrow down the list to find exactly what they are looking for before or during a conversation with Car Bot.
+
+### Available filters
+
+| Filter | Description |
+|--------|-------------|
+| Search | Free-text search by make or model name |
+| Brand | Dropdown to filter by manufacturer |
+| Max price | Slider from $0 to $100,000 |
+| Condition | Toggle between New and Used vehicles |
+
+## Vehicle data shown to buyers
+
+Each vehicle card in the catalog displays the following details:
+
+- Make and model
+- Year
+- Price
+- Mileage
+- Fuel type (gasoline, diesel, hybrid, electric)
+- Location
+- Condition (New or Used)
+
+Car Bot uses this same data during conversations. When a buyer asks "what's the mileage on the Hilux?" or "do you have any new SUVs under $35,000?", the bot queries your live inventory to give an accurate answer.
+
+## Example inventory
+
+The following vehicles are included in the Car Bot platform demo:
+
+| Vehicle | Year | Price | Mileage | Condition |
+|---------|------|-------|---------|-----------|
+| Toyota Corolla | 2020 | $22,500 | 45,000 km | Used |
+| Honda Civic | 2019 | $20,800 | 62,000 km | Used |
+| Jeep Grand Cherokee | 2022 | $48,000 | 12,000 km | Used |
+| Toyota Hilux | 2021 | $38,500 | 35,000 km | Used |
+| Hyundai Tucson | 2023 | $32,000 | 5,000 km | New |
+| BMW X5 | 2020 | $55,000 | 40,000 km | Used |
+
+<Note>
+  Inventory limits vary by plan. **Starter** supports up to 20 vehicles. **Premium** supports up to 100 vehicles. **Enterprise** is unlimited. See [Plans & Pricing](/pricing/overview) for details.
+</Note>
+
+## Adding vehicles to your inventory
+
+<Steps>
+  <Step title="Go to your dashboard">
+    Log in to your Car Bot account and open the main dashboard.
+  </Step>
+  <Step title="Navigate to the inventory section">
+    Select **Inventory** from the sidebar to open your vehicle management panel.
+  </Step>
+  <Step title="Add vehicle details">
+    Enter the following for each new vehicle: make, model, year, price, mileage, fuel type, location, and condition. All fields are used by the bot during customer conversations.
+  </Step>
+  <Step title="Car Bot learns the vehicle automatically">
+    Once you save the entry, Car Bot incorporates the new vehicle into its knowledge base. Customers can ask about it immediately — no additional configuration required.
+  </Step>
+</Steps>
+
+## Related pages
+
+- [Cars catalog](/dealers/cars-catalog) — the buyer-facing inventory page
+- [AI Chatbot](/features/ai-chatbot) — how the bot uses inventory data during conversations
+- [Analytics Dashboard](/features/analytics-dashboard) — track your current car count alongside other key metrics
